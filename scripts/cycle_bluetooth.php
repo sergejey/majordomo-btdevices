@@ -20,8 +20,10 @@ include_once(DIR_MODULES . "control_modules/control_modules.class.php");
 
 $ctl = new control_modules();
 
+/*
 if (!Defined('SETTINGS_BLUETOOTH_CYCLE') || SETTINGS_BLUETOOTH_CYCLE == 0)
    exit;
+*/
 
 $bt_devices = array();
 
@@ -29,7 +31,7 @@ $bt_devices = array();
 $devices_file = SERVER_ROOT . "/apps/bluetoothview/devices.txt";
 
 //linux command
-$bts_cmd = 'hcitool scan | grep ":"';
+$bts_cmd = 'sudo hcitool scan | grep ":"';
 
 $first_run    = 1;
 $skip_counter = 0;
@@ -59,16 +61,20 @@ while (1)
       else
       {
          //linux scanner
-         ob_start();
-         passthru($bts_cmd);
-         $bt_scan_arr = explode("\n", ob_get_contents());
-         ob_end_clean();
+         //ob_start();
+         echo "Running: ".$bts_cmd."\n";
+         $str=exec($bts_cmd, $bt_scan_arr);
+         //$bt_scan_arr = explode("\n", ob_get_contents());
+         //ob_end_clean();
          
          $lines = array();
-         $btScanArrayLength = count($bt_scan_arr) - 1;
+         $btScanArrayLength = count($bt_scan_arr);
          
          for ($i = 0; $i < $btScanArrayLength; $i++)
          {
+            if (!$bt_scan_arr[$i]) {
+             continue;
+            }
             $btstr      = explode("\t", $bt_scan_arr[$i]);
             $btaddr[$i] = $btstr[1];
             $btname[$i] = rtrim($btstr[2]);
@@ -77,6 +83,8 @@ while (1)
          
          $data = implode("\n",$lines);
       }
+
+      echo "Data: $data\n";
       
       $last_scan = time();
 
@@ -148,7 +156,10 @@ while (1)
                                        'previous_found' => $previous_found,
                                        'last_found'     => $rec['FIRST_FOUND']);
                   
-                  getObject('BlueDev')->raiseEvent("Found", $objectArray);
+                  $obj=getObject('BlueDev');
+                  if (is_object($obj)) {
+                   $obj->raiseEvent("Found", $objectArray);
+                  }
                }
                else
                {
@@ -204,7 +215,12 @@ while (1)
                $objectArray = array('mac'  => $k,
                                     'user' => $user['NAME']);
                
-               getObject('BlueDev')->raiseEvent("Lost", $objectArray);
+
+               $obj=getObject('BlueDev');
+               if (is_object($obj)) {
+                   $obj->raiseEvent("Lost", $objectArray);
+               }
+
 
                unset($bt_devices[$k]);
             }
