@@ -61,11 +61,7 @@ while (1)
       else
       {
          //linux scanner
-         //ob_start();
-         echo "Running: ".$bts_cmd."\n";
          $str=exec($bts_cmd, $bt_scan_arr);
-         //$bt_scan_arr = explode("\n", ob_get_contents());
-         //ob_end_clean();
          
          $lines = array();
          $btScanArrayLength = count($bt_scan_arr);
@@ -83,8 +79,6 @@ while (1)
          
          $data = implode("\n",$lines);
       }
-
-      echo "Data: $data\n";
       
       $last_scan = time();
 
@@ -165,7 +159,7 @@ while (1)
                {
                   $sqlQuery = "SELECT * 
                                  FROM btdevices 
-                                WHERE MAC LIKE '" . $mac . "'";
+                                WHERE MAC = '" . $mac . "'";
                   
                   $rec = SQLSelectOne($sqlQuery);
                   $rec['LAST_FOUND'] = date('Y/m/d H:i:s');
@@ -193,7 +187,7 @@ while (1)
                $user = array();
                $sqlQuery = "SELECT * 
                               FROM btdevices 
-                             WHERE MAC LIKE '" . $k . "'";
+                             WHERE MAC = '" . $k . "'";
                
                $rec  = SQLSelectOne($sqlQuery);
                
