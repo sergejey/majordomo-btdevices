@@ -36,8 +36,8 @@
 
 [#if VIEW_MODE="edit_btdevices"#]
 <p align="center"><a href="?"><#LANG_BACK#></a></p>
+<form action="?" method="post">
 <table border="0" align="center">
- <form action="?" method="post">
  <tr>
   <td align="right"><#LANG_TITLE#>:</td>
   <td><input type="text" name="title" value="[#TITLE#]"></td>
@@ -75,7 +75,6 @@
  <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
  <input type="hidden" name="id" value="[#ID#]">
  <input type="hidden" name="mode" value="update">
- </form>
-
 </table>
+</form>
 [#endif VIEW_MODE#]
