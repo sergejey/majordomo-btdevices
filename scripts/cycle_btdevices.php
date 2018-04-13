@@ -32,16 +32,21 @@ $devices_file = SERVER_ROOT . "/apps/bluetoothview/devices.txt";
 
 //linux command
 $bts_cmd = 'sudo hcitool scan | grep ":"';
+$bts_cmd_le = 'timeout -s INT 30s hcitool lescan | grep ":"';
+
 
 $first_run    = 1;
-$skip_counter = 0;
+$skip_counter = 10;
 
 echo "Running bluetooth scanner\n";
 
 while (1)
 {
+    
+   setGlobal((str_replace('.php', '', basename(__FILE__))) . 'Run', time(), 1);
+   
    $skip_counter++;
-   if ($skip_counter >= 30)
+   if ($skip_counter >= 1)
    {
       $skip_counter = 0;
       $data = '';
@@ -61,8 +66,9 @@ while (1)
       else
       {
          //linux scanner
+         $bt_scan_arr = array();
          $str=exec($bts_cmd, $bt_scan_arr);
-         
+         $str=exec($bts_cmd_le, $bt_scan_arr);
          $lines = array();
          $btScanArrayLength = count($bt_scan_arr);
          
@@ -71,17 +77,19 @@ while (1)
             if (!$bt_scan_arr[$i]) {
              continue;
             }
-            $btstr      = explode("\t", $bt_scan_arr[$i]);
-            $btaddr[$i] = $btstr[1];
-            $btname[$i] = rtrim($btstr[2]);
-            $lines[]    = $i . "\t" . $btname[$i] . "\t" . $btaddr[$i];
+            //echo $bt_scan_arr[$i].PHP_EOL;
+            $bt_scan = trim($bt_scan_arr[$i]);
+            //echo $bt_scan.PHP_EOL;
+            $btaddr = substr ($bt_scan, 0, 17);
+            $btname = trim(substr ($bt_scan, 17));
+            $lines[]    = $i . "\t" . $btname . "\t" . $btaddr;
          }
          
          $data = implode("\n",$lines);
       }
       
       $last_scan = time();
-
+      //print_r ($data);
       if ($data)
       {
          $data = str_replace(chr(0), '', $data);
@@ -110,6 +118,7 @@ while (1)
                   
                   $rec = SQLSelectOne($sqlQuery);
                   $previous_found = $rec['LAST_FOUND'];
+                  $rec['FOUND'] = 1;
                   $rec['LAST_FOUND'] = date('Y/m/d H:i:s');
                   $rec['LOG'] = 'Device found ' . date('Y/m/d H:i:s') . "\n" . $rec['LOG'];
                   
@@ -163,8 +172,9 @@ while (1)
                   
                   $rec = SQLSelectOne($sqlQuery);
                   $rec['LAST_FOUND'] = date('Y/m/d H:i:s');
+                  $rec['FOUND'] = 1;
                   
-                  if ($title != '')
+                  if ($title != '' && $title != '(unknown)')
                   {
                      $rec['TITLE'] = 'Устройство: ' . $title;
                   }
@@ -179,7 +189,7 @@ while (1)
 
          foreach ($bt_devices as $k => $v)
          {
-            if ($v != $last_scan)
+            if ($last_scan - $v >= 5*60)
             {
                //device removed
                echo date('Y/m/d H:i:s') . ' Device gone: ' . $k . '\n';
@@ -193,7 +203,8 @@ while (1)
                
                if ($rec['ID'])
                {
-                  $rec['LOG'] = 'Device lost ' . date('Y/m/d H:i:s') . '\n' . $rec['LOG'];
+                  $rec['LOG'] = 'Device lost ' . date('Y/m/d H:i:s') . "\n" . $rec['LOG'];
+                  $rec['FOUND'] = 0;
                   SQLUpdate('btdevices', $rec);
                   
                   if ($rec['USER_ID'])
@@ -214,8 +225,6 @@ while (1)
                if (is_object($obj)) {
                    $obj->raiseEvent("Lost", $objectArray);
                }
-
-
                unset($bt_devices[$k]);
             }
          }
@@ -230,7 +239,7 @@ while (1)
       exit;
    }
    
-   sleep(1);
+   sleep(10);
 }
 
 // closing database connection
