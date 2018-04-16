@@ -110,7 +110,7 @@ while (1)
                {
                   // && !$first_run
                   //new device found
-                  echo date('Y/m/d H:i:s') . ' Device found: ' . $mac . '\n';
+                  echo date('Y/m/d H:i:s') . ' Device found: ' . $mac . PHP_EOL;
                   
                   $sqlQuery = "SELECT * 
                                  FROM btdevices 
@@ -186,13 +186,13 @@ while (1)
                $bt_devices[$mac] = $last_scan;
             }
          }
-
+      }
          foreach ($bt_devices as $k => $v)
          {
             if ($last_scan - $v >= 5*60)
             {
                //device removed
-               echo date('Y/m/d H:i:s') . ' Device gone: ' . $k . '\n';
+               echo date('Y/m/d H:i:s') . ' Device gone: ' . $k . PHP_EOL;
                
                $user = array();
                $sqlQuery = "SELECT * 
@@ -228,7 +228,6 @@ while (1)
                unset($bt_devices[$k]);
             }
          }
-      }
    }
 
    $first_run = 0;
