@@ -122,7 +122,7 @@ while (1)
                   $rec['LAST_FOUND'] = date('Y/m/d H:i:s');
                   $rec['LOG'] = 'Device found ' . date('Y/m/d H:i:s') . "\n" . $rec['LOG'];
                   
-                  if (!$rec['ID'])
+                  if (!$rec['ID'] && $title != '(unknown)')
                   {
                      $rec['FIRST_FOUND'] = $rec['LAST_FOUND'];
                      $previous_found = $rec['LAST_FOUND'];
@@ -135,7 +135,7 @@ while (1)
                      
                      $new = 1;
                      
-                     SQLInsert('btdevices', $rec);
+                     $rec['ID']=SQLInsert('btdevices', $rec);
                   }
                   else
                   {
@@ -152,16 +152,18 @@ while (1)
                      
                      SQLUpdate('btdevices', $rec);
                   }
-                  
-                  $objectArray = array('mac'            => $mac,
-                                       'user'           => $user['NAME'],
-                                       'new'            => $new,
-                                       'previous_found' => $previous_found,
-                                       'last_found'     => $rec['FIRST_FOUND']);
-                  
-                  $obj=getObject('BlueDev');
-                  if (is_object($obj)) {
-                   $obj->raiseEvent("Found", $objectArray);
+                  if ($rec['ID'])
+                  {
+                      $objectArray = array('mac'            => $mac,
+                                           'user'           => $user['NAME'],
+                                           'new'            => $new,
+                                           'previous_found' => $previous_found,
+                                           'last_found'     => $rec['FIRST_FOUND']);
+                      
+                      $obj=getObject('BlueDev');
+                      if (is_object($obj)) {
+                       $obj->raiseEvent("Found", $objectArray);
+                      }
                   }
                }
                else
