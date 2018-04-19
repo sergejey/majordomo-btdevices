@@ -4,27 +4,46 @@
 <big><#LANG_MODULE_BT_DEVICES#></big>
 [#if VIEW_MODE=""#]
 [#if DEVICES#]
-<p align="center"><a href="?mode=delete_unknown" onclick="return confirm('<#LANG_ARE_YOU_SURE#>');"><#LANG_DELETE_ALL_UNKNOWN_DEVICES#></a>
-<a href="?mode=delete_once" onclick="return confirm('<#LANG_ARE_YOU_SURE#>');"><#LANG_DELETE_FOUND_ONCE#></a>
-</p>
-<table border="1" cellpadding="3">
+<br><br>
+<div>
+ <a class="btn btn-default" href="?mode=delete_unknown" onclick="return confirm('<#LANG_ARE_YOU_SURE#>');"><#LANG_DELETE_ALL_UNKNOWN_DEVICES#></a>
+ <a class="btn btn-default" href="?mode=delete_once" onclick="return confirm('<#LANG_ARE_YOU_SURE#>');"><#LANG_DELETE_FOUND_ONCE#></a>&nbsp;
+ 	[#if CYCLERUN==1#]
+		<span class="label label-success" title="Статус цикла">Цикл запущен</span>
+	[#else#]
+		<span class="label label-danger" title="Статус цикла">Цикл остановлен</span>
+	[#endif#]
+</div><br>
+<table align="center" class="table table-striped">
  <tr>
-  <td valign="top" align="center"><b><#LANG_TITLE#></b></td>
-  <td valign="top" align="center"><b><#LANG_CODE#></b></td>
-  <td valign="top" align="center"><b><#LANG_FOUND_FIRST#></b></td>
-  <td valign="top" align="center"><b><#LANG_FOUND_LAST#></b></td>
-  <td valign="top" align="center"><b><#LANG_USER#></b></td>
-  <td valign="top">&nbsp;</td>
+  <td><b><#LANG_TITLE#></b></td>
+  <td><b><#LANG_CODE#></b></td>
+  <td>&nbsp;</td>
+  <td><b><#LANG_FOUND_FIRST#></b></td>
+  <td><b><#LANG_FOUND_LAST#></b></td>
+  <td><b><#LANG_USER#></b></td>
+  <td>&nbsp;</td>
  </tr>
  [#begin DEVICES#]
  <tr>
-  <td valign="top">[#TITLE#]</td>
-  <td valign="top">[#MAC#]</td>
-  <td valign="top">[#FIRST_FOUND#]</td>
-  <td valign="top">[#LAST_FOUND#]</td>
-  <td valign="top">[#NAME#]&nbsp;</td>
-  <td valign="top"><a href="?view_mode=edit_btdevices&id=[#ID#]"><#LANG_EDIT#></a>
-  <a href="?view_mode=delete_btdevices&id=[#ID#]" onClick="return confirm('<#LANG_ARE_YOU_SURE#>')"><#LANG_DELETE#></a>
+  <td>[#TITLE#]</td>
+  <td>[#MAC#]</td>
+  <td style="vertical-align:middle">
+	[#if FOUND!=""#]
+		[#if FOUND==1#]
+			<span class="label label-success" title="<#LANG_XIMI_APP_ONLINE#>">Online</span>
+		[#else#]
+			<span class="label label-warning" title="<#LANG_XIMI_APP_OFFLINE#>">Offline</span>
+		[#endif#]
+	[#else#]
+		&nbsp;
+	[#endif#]
+ </td> 
+  <td>[#FIRST_FOUND#]</td>
+  <td>[#LAST_FOUND#]</td>
+  <td>[#NAME#]&nbsp;</td>
+  <td><a href="?view_mode=edit_btdevices&id=[#ID#]" class="btn btn-default" title="<#LANG_EDIT#>"><i class="glyphicon glyphicon-pencil"></i></a> 
+  <a href="?view_mode=delete_btdevices&id=[#ID#]" onClick="return confirm('Are you sure? Please confirm.')" class="btn btn-default" title="<#LANG_DELETE#>"><i class="glyphicon glyphicon-remove"></i></a> 
   </td>
  </tr>
  [#end DEVICES#]
@@ -35,46 +54,53 @@
 [#endif VIEW_MODE#]
 
 [#if VIEW_MODE="edit_btdevices"#]
-<p align="center"><a href="?"><#LANG_BACK#></a></p>
-<form action="?" method="post">
-<table border="0" align="center">
- <tr>
-  <td align="right"><#LANG_TITLE#>:</td>
-  <td><input type="text" name="title" value="[#TITLE#]"></td>
- </tr>
- <tr>
-  <td align="right"><#LANG_USER#>:</td>
-  <td><select name="user_id">
+<p align="left"><a class="btn btn-default" href="?"><#LANG_BACK#></a></p>
+<form action="?" method="post" class="form-horizontal">
+<fieldset>
+<div class="form-group">
+ <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+ <#LANG_TITLE#>:
+ (*)
+ </label>
+ <div class="col-lg-8"><input type="text" class="form-control" name="title" value="[#TITLE#]" id="title"></div>
+</div>
+<div class="form-group">
+ <label class="col-lg-3 control-label"><#LANG_USER#>:
+ </label>
+ <div class="col-lg-8">
+  <select name="user_id" class="form-control">
    <option value="0">n/a
    [#begin USERS#]
    <option value="[#ID#]"[#if ID="<#USER_ID#>"#] selected[#endif SELECTED#]>[#NAME#]
    [#end USERS#]
-  </select></td>
- </tr>
- <tr>
-  <td align="right"><#LANG_CODE#>:</td>
-  <td>[#MAC#]</td>
- </tr>
- <tr>
-  <td align="right"><#LANG_FOUND_FIRST#>:</td>
-  <td>[#FIRST_FOUND#]</td>
- </tr>
- <tr>
-  <td align="right"><#LANG_FOUND_LAST#>:</td>
-  <td>[#LAST_FOUND#]</td>
- </tr>
- <tr>
-  <td align="right"><#LANG_HISTORY#>:</td>
-  <td>[#LOG#]</td>
- </tr>
+  </select></div>
+</div>
+<div class="form-group">
+ <label class="col-lg-3 control-label"><#LANG_CODE#>: </label>
+ <div class="col-lg-8">[#MAC#]</div>
+</div>
+<div class="form-group">
+ <label class="col-lg-3 control-label"><#LANG_FOUND_FIRST#>: </label>
+ <div class="col-lg-8">[#FIRST_FOUND#]</div>
+</div>
+<div class="form-group">
+ <label class="col-lg-3 control-label"><#LANG_FOUND_LAST#>: </label>
+ <div class="col-lg-8">[#LAST_FOUND#]</div>
+</div>
+<div class="form-group">
+ <label class="col-lg-3 control-label"><#LANG_HISTORY#>: </label>
+ <div class="col-lg-8">[#LOG#]</div>
+</div>
 
- <tr>
-  <td valign="top">&nbsp;</td>
-  <td valign="top"><input type="submit" name="submit" value="<#LANG_UPDATE#>"></td>
- </tr>
+<div class="form-group">
+ <div class="col-lg-offset-3 col-lg-8">
+ <button type="submit" name="submit" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+ <a href="?data_source=<#DATA_SOURCE#>" class="btn btn-default "><#LANG_CANCEL#></a>
  <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
  <input type="hidden" name="id" value="[#ID#]">
  <input type="hidden" name="mode" value="update">
-</table>
+ </div>
+</div>
+</fieldset>
 </form>
 [#endif VIEW_MODE#]

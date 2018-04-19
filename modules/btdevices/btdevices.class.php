@@ -31,7 +31,7 @@ function btdevices() {
 *
 * @access public
 */
-function saveParams() {
+function saveParams($data=0) {
  $p=array();
  if (IsSet($this->id)) {
   $p["id"]=$this->id;
@@ -117,6 +117,11 @@ function run() {
 * @access public
 */
 function admin(&$out) {
+ if ((time() - gg('cycle_btdevicesRun')) < 120 ) {
+   $out['CYCLERUN'] = 1;
+ } else {
+   $out['CYCLERUN'] = 0;
+ }
  if (isset($this->data_source) && !$_GET['data_source'] && !$_POST['data_source']) {
   $out['SET_DATASOURCE']=1;
  }
@@ -240,6 +245,7 @@ btdevices - btdevices
  btdevices: TITLE varchar(255) NOT NULL DEFAULT ''
  btdevices: MAC varchar(255) NOT NULL DEFAULT ''
  btdevices: LOG text NOT NULL DEFAULT ''
+ btdevices: FOUND int(3) unsigned NOT NULL DEFAULT '0'
  btdevices: LAST_FOUND datetime
  btdevices: FIRST_FOUND datetime
  btdevices: SCRIPT_ID int(10) NOT NULL DEFAULT '0'
