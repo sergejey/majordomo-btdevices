@@ -38,6 +38,9 @@ $bts_cmd_le = 'timeout -s INT 30s hcitool lescan | grep ":"';
 $first_run    = 1;
 $skip_counter = 10;
 
+$sql = "update btdevices set FOUND = 0";
+SQLSelect($sql);
+
 echo "Running bluetooth scanner\n";
 
 while (1)
