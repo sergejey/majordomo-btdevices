@@ -33,10 +33,16 @@ $devices_file = SERVER_ROOT . "/apps/bluetoothview/devices.txt";
 //linux command
 $bts_cmd = 'sudo hcitool scan | grep ":"';
 $bts_cmd_le = 'timeout -s INT 30s hcitool lescan | grep ":"';
+$bts_reset = 'sudo hciconfig hci0 down; sudo hciconfig hci0 up';
 
+$reset_time = 0;
+$reset_perion = 2 * 60 * 60;
 
 $first_run    = 1;
 $skip_counter = 10;
+
+$sql = "update btdevices set FOUND = 0";
+SQLSelect($sql);
 
 echo "Running bluetooth scanner\n";
 
@@ -44,6 +50,18 @@ while (1)
 {
     
    setGlobal((str_replace('.php', '', basename(__FILE__))) . 'Run', time(), 1);
+   
+   // reset bluetooth
+   if (!IsWindowsOS())
+   {
+       
+       if (time()-$reset_time >$reset_perion)
+       {
+           echo date('Y/m/d H:i:s') . ' Reset bluetooth'. PHP_EOL;
+           exec($bts_reset);
+           $reset_time = time();
+       }
+   }
    
    $skip_counter++;
    if ($skip_counter >= 1)
