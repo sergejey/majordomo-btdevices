@@ -49,16 +49,6 @@ while (1)
       setGlobal((str_replace('.php', '', basename(__FILE__))) . 'Run', time(), 1);
    }
 
-   // reset bluetooth
-   if (!IsWindowsOS()) {
-
-       if (time()-$reset_time > $reset_perion) {
-           echo date('Y/m/d H:i:s') . ' Reset bluetooth'. PHP_EOL;
-           exec($bts_reset);
-           $reset_time = time();
-       }
-   }
-
    if (time() - $last_scan >= 60) {
       $data = '';
 
@@ -72,6 +62,13 @@ while (1)
             sleep(5);
          }
       } else {
+         //reset bluetooth
+         if (time()-$reset_time > $reset_perion) {
+            echo date('Y/m/d H:i:s') . ' Reset bluetooth'. PHP_EOL;
+            exec($bts_reset);
+            $reset_time = time();
+         }
+
          //linux scanner
          $bt_scan_arr = array();
          $str=exec($bts_cmd, $bt_scan_arr);
@@ -160,7 +157,7 @@ while (1)
 
                      $obj=getObject('BlueDev');
                      if (is_object($obj)) {
-                        $obj->callMethod('Found', $objectArray);
+                        $obj->callMethodSafe('Found', $objectArray);
                      }
                   }
                } else {
@@ -216,7 +213,7 @@ while (1)
 
             $obj=getObject('BlueDev');
             if (is_object($obj)) {
-                  $obj->callMethod('Lost', $objectArray);
+                  $obj->callMethodSafe('Lost', $objectArray);
             }
             unset($bt_devices[$k]);
          }
