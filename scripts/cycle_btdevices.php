@@ -37,7 +37,7 @@ $reset_perion = 4*60*60;
 $last_scan = 0;
 
 $sql = "update btdevices set FOUND = 0";
-SQLSelect($sql);
+SQLExec($sql);
 
 echo "Running bluetooth scanner\n";
 
